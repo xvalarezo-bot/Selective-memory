@@ -14,7 +14,10 @@ export async function embed(text: string): Promise<number[]> {
                  Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },
       body: JSON.stringify({ model: "text-embedding-3-small", input: text }),
     });
-    return (await r.json()).data[0].embedding;
+    if (!r.ok) throw new Error(`embedding API error ${r.status}: ${await r.text()}`);
+    const data = await r.json();
+    if (!data.data?.[0]?.embedding) throw new Error(`unexpected embedding response: ${JSON.stringify(data)}`);
+    return data.data[0].embedding;
   }
   if (!pipe) {
     const { pipeline } = await import("@xenova/transformers");
