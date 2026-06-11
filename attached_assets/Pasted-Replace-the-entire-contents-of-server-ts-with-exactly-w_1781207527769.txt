@@ -1,3 +1,8 @@
+Replace the entire contents of server.ts with exactly what's below (full overwrite).
+Do not modify anything else. Do not run npm install or npm audit fix.
+After replacing, the server needs a restart: stop any running "tsx server.ts" process.
+
+```
 // server.ts — the brain's MCP surface. One server, any backend, any AI.
 //
 // RENTED COGNITION: the brain owns storage, math, time, and decay — it has NO
@@ -399,3 +404,5 @@ if (process.env.MCP_HTTP === "stdio") {
 
   app.listen(PORT, () => console.log(`brain MCP server listening on :${PORT} (POST /mcp)`));
 }
+
+```
