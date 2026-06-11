@@ -39,7 +39,7 @@ const cues = await store.allSemanticCues();
 async function score(msg: string) {
   const qe = await embed(msg);
   let best = 0;
-  for (const c of cues) if (c.embedding) best = Math.max(best, cosine(qe, c.embedding) * (c.weight ?? 1) * c.strength);
+  for (const c of cues) if (c.embedding && c.embedding.length === qe.length) best = Math.max(best, cosine(qe, c.embedding) * (c.weight ?? 1) * c.strength);
   return best;
 }
 
