@@ -43,6 +43,10 @@ async function score(msg: string) {
   return best;
 }
 
+console.log("cues:", cues.map(c => ({ text: c.cue_text, dim: c.embedding?.length })));
+const qeMatch = await embed("I went to the boardwalk and bought salt water taffy");
+const qeMiss = await embed("What's the weather in Cuenca tomorrow?");
+console.log("qe match dim:", qeMatch.length, "qe miss dim:", qeMiss.length);
 const hit = await score("I went to the boardwalk and bought salt water taffy");
 const miss = await score("What's the weather in Cuenca tomorrow?");
 console.log("matching message score:", hit.toFixed(3));
