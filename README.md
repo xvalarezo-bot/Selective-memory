@@ -34,17 +34,29 @@ Secrets are referenced in config as `${VAR}` and resolved from the environment.
 every memory is stamped with the writing actor (cross-platform corroboration
 counts as independent witnesses). Per-platform isolation = change one binding.
 
-## Connecting AI platforms
-
-Mobile AI apps connect from their cloud, so the server needs a URL:
+## Running
 
 ```bash
-cloudflared tunnel --url http://localhost:3111   # or: tailscale funnel 3111
+npx tsx server.ts          # HTTP server on $PORT (default 3000) — for remote connectors
+MCP_HTTP=stdio npx tsx server.ts   # stdio — for local MCP clients (Claude Desktop config)
 ```
 
-Then: Claude → Settings → Connectors → add custom connector (URL).
-ChatGPT → Settings → Connectors (MCP). The tool descriptions teach the
-connected AI the protocol: wake → sweep per message → write at end → sleep.
+On Replit, the dev URL Replit assigns to your Repl (the "Webview" address,
+something like `https://<repl-name>.<you>.repl.co` or `*.replit.dev`) is
+already public — Anthropic's cloud can reach it directly. No tunnel needed.
+
+Optional: set `BRAIN_ACCESS_KEY` as a secret to require `?key=...` on the
+`/mcp` URL — recommended once you point a connector at this server, since it
+has write access to your private brain repo.
+
+## Connecting AI platforms
+
+Claude → **Customize → Connectors → "+" → Add custom connector** → paste
+`https://<your-repl-url>/mcp` (append `?key=...` if you set `BRAIN_ACCESS_KEY`)
+→ Add. ChatGPT → Settings → Connectors → Add custom connector (MCP), same URL.
+
+The tool descriptions teach the connected AI the protocol: wake → sweep per
+message → write at end → sleep.
 
 ## Birth test
 
