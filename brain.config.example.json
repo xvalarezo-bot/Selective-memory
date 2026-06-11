@@ -1,0 +1,15 @@
+{
+  "brains": {
+    "main": {
+      "backend": "github",
+      "options": { "repo": "YOUR_USER/xv-brain", "token": "${BRAIN_GITHUB_TOKEN}", "branch": "main" }
+    },
+    "local-example": { "backend": "sqlite", "options": { "path": "./brain.db" } },
+    "supabase-example": {
+      "backend": "supabase",
+      "options": { "url": "${SUPABASE_URL}", "service_key": "${SUPABASE_SERVICE_KEY}" }
+    }
+  },
+  "bindings": { "claude": "main", "gpt": "main", "gemini": "main" },
+  "default_brain": "main"
+}
