@@ -1,0 +1,10 @@
+{
+  "brains": {
+    "main": {
+      "backend": "github",
+      "options": { "repo": "xvalarezo-bot/xv-brain", "token": "${BRAIN_GITHUB_TOKEN}", "branch": "main" }
+    }
+  },
+  "bindings": { "claude": "main", "gpt": "main", "gemini": "main" },
+  "default_brain": "main"
+}

@@ -1,5 +1,4 @@
 node_modules/
-brain.config.json
 .env
 brain.db
 *.db

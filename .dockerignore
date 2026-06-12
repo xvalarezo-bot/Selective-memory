@@ -1,0 +1,8 @@
+node_modules
+.git
+brain.db
+*.db
+.env
+test-*.ts
+test-*.mjs
+test-*.sh
