@@ -359,6 +359,7 @@ if (process.env.MCP_HTTP === "stdio") {
 } else {
   const PORT = Number(process.env.PORT) || 3000;
   const app = createMcpExpressApp({ host: "0.0.0.0" });
+  app.set("trust proxy", true); // Cloud Run terminates TLS; respect X-Forwarded-Proto
 
   // OAuth 2.1 + PKCE routes (discovery, register, authorize, token)
   app.use(oauthRouter);
