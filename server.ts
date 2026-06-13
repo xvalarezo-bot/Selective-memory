@@ -17,6 +17,7 @@ import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js
 import { z } from "zod";
 import { loadConfig, brainFor, type BrainStore } from "./store.js";
 import { embed, cosine } from "./embeddings.js";
+import { oauthRouter } from "./oauth.js";
 
 const cfg = loadConfig();
 const FIRE_THRESHOLD = 0.78, MAX_FIRES = 5, MATURITY = 2000, MIN_PLASTICITY = 0.15;
@@ -359,17 +360,20 @@ if (process.env.MCP_HTTP === "stdio") {
   const PORT = Number(process.env.PORT) || 3000;
   const app = createMcpExpressApp({ host: "0.0.0.0" });
 
+  // OAuth 2.1 + PKCE routes (discovery, register, authorize, token)
+  app.use(oauthRouter);
+
   app.get("/", (_req, res) => {
     res.type("text/plain").send("selective-memory-brain: MCP server running. POST /mcp");
   });
 
   // Optional shared-secret gate. If BRAIN_ACCESS_KEY is set, requests to /mcp must
-  // include it as ?key=... or an X-Brain-Key header. Recommended once you point a
-  // connector at this URL, since the brain has write access to your private repo.
+  // include it as ?key=..., X-Brain-Key header, or Authorization: Bearer <key>.
   const ACCESS_KEY = process.env.BRAIN_ACCESS_KEY;
   if (ACCESS_KEY) {
     app.use("/mcp", (req, res, next) => {
-      const key = (req.query.key as string | undefined) ?? req.header("x-brain-key");
+      const bearer = (req.header("authorization") ?? "").replace(/^Bearer\s+/i, "") || undefined;
+      const key = (req.query.key as string | undefined) ?? req.header("x-brain-key") ?? bearer;
       if (key !== ACCESS_KEY) {
         res.status(401).json({ jsonrpc: "2.0", error: { code: -32001, message: "Unauthorized" }, id: null });
         return;
