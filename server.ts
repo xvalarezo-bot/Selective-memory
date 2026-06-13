@@ -39,6 +39,17 @@ function freshness(conf: number, iso: string, vol?: number | null) {
   return { eff, stale: eff < conf * 0.5 };
 }
 
+// Identity is RENDER-TIME, not stored. brain_wake prepends "You are {actor}".
+const IDENTITY_LINE =
+  /^\s*(identity|i am|you are|persona|name)\b\s*[:\-—]?.*$/i;
+
+export function renderSelfBody(body: string | null | undefined, actor: string): string {
+  if (!body || !body.trim()) return "(newborn — no self-model yet)";
+  const kept = body.split("\n").filter((line, i) => !(i === 0 && IDENTITY_LINE.test(line)));
+  const cleaned = kept.join("\n").trim();
+  return cleaned.length ? cleaned : `(self-model held only an identity line; you are ${actor})`;
+}
+
 function createServer(): McpServer {
 const server = new McpServer({ name: "selective-memory-brain", version: "1.0.0" });
 
@@ -54,8 +65,9 @@ server.tool("brain_wake",
     const gapH = gapSeconds / 3600;
     const gap = gapH > 48 ? `${Math.round(gapH / 24)} days` : `${Math.round(gapH)} hours`;
     return { content: [{ type: "text", text:
+      `You are ${actor}, the AI currently connected to this shared memory.\n` +
       `now: ${new Date().toISOString()} | last awake: ${gap} ago | session #${sessionCount} (${actor})\n` +
-      `self-model:\n${selfNodes[0]?.body ?? "(newborn — no self-model yet)"}` }] };
+      `self-model:\n${renderSelfBody(selfNodes[0]?.body, actor)}` }] };
   });
 
 // ---------- SWEEP (recall) ----------
@@ -226,7 +238,10 @@ server.tool("brain_sleep",
       `"contradictions":[{"a_id":"","b_id":""}]}\n` +
       JSON.stringify(recent) + `\n\n` +
       `2. SELF-MODEL — merge the current self-model with recent learnings into <=20 lines: ` +
-      `identity, who it serves, recurring domains, learned preferences, open threads. ` +
+      `who it serves, recurring domains, learned preferences, open threads. ` +
+      `Do NOT name or describe yourself (no "Identity: ...", no "I am ...", no model/persona ` +
+      `name) — the body is shared across every connected AI and identity is added at wake time. ` +
+      `Write only facts about XV and the work. ` +
       `Submit via brain_self_commit as {"body":"..."}.\n` +
       `CURRENT SELF-MODEL:\n${selfNode?.body ?? "(newborn — none yet)"}\n` +
       `RECENT LEARNINGS:\n${learnings.map(l => "- " + l).join("\n") || "(none yet)"}\n\n` +
